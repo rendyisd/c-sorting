@@ -124,6 +124,50 @@ int *quick_sort(int *arr, int n)
     return arr;
 }
 
+// Hope this also has no memory leak
+int *merge_sort(int *arr, int n)
+{
+    if(n <= 1) return arr;
+
+    int half = n/2;
+
+    int *first_half = merge_sort(copy_arr(arr, half), half);
+    int *last_half = merge_sort(copy_arr(&arr[half], n-half), n-half);
+
+
+    int f_iter = 0;
+    int l_iter = 0;
+    int ret_iter = 0;
+    // merge
+    while(f_iter < half && l_iter < n-half){
+        if(first_half[f_iter] > last_half[l_iter]){
+            arr[ret_iter] = last_half[l_iter];
+            l_iter++;
+        }
+        else{
+            arr[ret_iter] = first_half[f_iter];
+            f_iter++;
+        }
+        ret_iter++;
+    }
+
+    while(f_iter < half){
+        arr[ret_iter] = first_half[f_iter];
+        ret_iter++;
+        f_iter++;
+    }
+    while(l_iter < n-half){
+        arr[ret_iter] = last_half[l_iter];
+        ret_iter++;
+        l_iter++;
+    }
+
+    free(first_half);
+    free(last_half);
+    
+    return arr;
+}
+
 // -----------------------------------------------------------------------------
 
 void check_algo(int* (*sort)(int*, int), int *to_be_sorted, int *ground_truth, int n)
@@ -167,6 +211,9 @@ int main()
 
     printf("quick_sort: ");
     check_algo(quick_sort, init_arr, sorted_arr, ARR_SIZE);
+
+    printf("merge_sort: ");
+    check_algo(merge_sort, init_arr, sorted_arr, ARR_SIZE);
 
     return 0;
 }
